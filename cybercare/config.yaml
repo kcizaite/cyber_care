@@ -1,0 +1,18 @@
+# config.yaml - config file
+event_propagator:
+  interval_seconds: 5  # The period of time between sent JSON objects(events) should be configurable via a configuration file
+  api_endpoint: "http://localhost:8001/event"  # The HTTP API endpoint that the payloads are sent to should be configurable via a configuration file
+  events_file: "events.json"  # The location of the JSON objects(events) file should be configurable via a configuration file
+
+
+event_consumer:
+  port: 8001  # The port for running HTTP API should be configurable via a configuration file
+  database:
+    type: "sqlite"
+    path: "events.db"
+    # If using a different database:
+    # host: "localhost"
+    # port: 5432
+    # database: "events_db"
+    # username: "user"
+    # password: "password"

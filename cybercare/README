@@ -1,0 +1,200 @@
+# Event Communication System
+
+A Python-based event communication system with two microservices:
+- **Event Propagator**: Periodically sends random JSON events to HTTP API
+- **Event Consumer**: HTTP API server that receives and stores events in SQLite database
+
+## Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Poetry (recommended) or pip
+- Virtual environment
+
+### Installation & Setup
+
+#### Option 1: Using Poetry (Recommended)
+
+1. **Install Poetry** (if not installed):
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+2. **Clone and setup:**
+   ```bash
+   git clone <repository>
+   cd cybercare
+   poetry install
+   ```
+
+3. **Activate Poetry shell:**
+   ```bash
+   poetry shell
+   ```
+
+#### Option 2: Using pip
+
+1. **Clone and setup virtual environment:**
+   ```bash
+   git clone <repository>
+   cd cybercare
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Running the System
+
+**Terminal 1: Start Event Consumer**
+```bash
+# With Poetry
+poetry run python event_consumer.py
+
+# With pip/direct
+python event_consumer.py
+```
+
+**Terminal 2: Start Event Propagator**
+```bash
+# With Poetry
+poetry run python event_propagator.py
+
+# With pip/direct
+python event_propagator.py
+```
+
+### Configuration
+
+Edit `config.yaml` to customize settings:
+
+```yaml
+event_propagator:
+  interval_seconds: 5                          # Send interval
+  api_endpoint: "http://localhost:8001/event"  # Target API
+  events_file: "events.json"                   # Events source file
+
+event_consumer:
+  port: 8001              # HTTP API port
+  database:
+    type: "sqlite"
+    path: "events.db"     # Database file
+```
+
+### Command Line Options
+
+**Event Consumer:**
+```bash
+# With Poetry
+poetry run python event_consumer.py --port 9000 --db-path custom.db
+
+# With pip/direct
+python event_consumer.py --port 9000 --db-path custom.db
+```
+
+**Event Propagator:**
+```bash
+# With Poetry
+poetry run python event_propagator.py --interval 10 --endpoint http://localhost:9000/event
+
+# With pip/direct
+python event_propagator.py --interval 10 --endpoint http://localhost:9000/event
+```
+
+### API Endpoints
+
+- `POST /event` - Receive and store events
+- `GET /` - Service status and statistics
+
+### Testing
+
+**PowerShell (Windows):**
+```powershell
+# Test service status
+Invoke-RestMethod -Uri "http://localhost:8001/" -Method GET
+
+# Test event submission
+$body = @{event_type="test"; event_payload="manual test"} | ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:8001/event" -Method POST -Body $body -ContentType "application/json"
+```
+
+**curl (Linux/macOS/Git Bash):**
+```bash
+# Test service status
+curl http://localhost:8001/
+
+# Test event submission
+curl -X POST http://localhost:8001/event \
+  -H "Content-Type: application/json" \
+  -d '{"event_type": "message", "event_payload": "hello"}'
+```
+
+### Project Structure
+
+```
+cybercare/
+├── event_consumer.py      # HTTP API server (receives events)
+├── event_propagator.py    # Event sender (sends events)
+├── config.yaml           # Configuration file
+├── events.json           # Event templates
+├── pyproject.toml        # Poetry dependencies (preferred)
+├── requirements.txt      # pip dependencies (fallback)
+├── README.md            # This file
+└── events.db            # SQLite database (auto-created)
+```
+
+### Dependency Management
+
+This project supports both **Poetry** (preferred) and **pip**:
+
+- **pyproject.toml** - Poetry configuration (recommended)
+- **requirements.txt** - pip fallback
+
+**Poetry commands:**
+```bash
+poetry install          # Install dependencies
+poetry shell           # Activate virtual environment
+poetry add <package>   # Add new dependency
+poetry update          # Update dependencies
+```
+
+### Troubleshooting
+
+**Consumer not receiving events:**
+- Check if consumer is running: Visit `http://localhost:8001/` in browser
+- Verify port configuration matches in both services
+
+**JSON parsing errors:**
+- Check for trailing commas in JSON
+
+**Port already in use:**
+- Change port: `python event_consumer.py --port 9000`
+- Or kill existing processes using the port
+
+**Poetry not found:**
+- Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`
+- Or use pip instead: `pip install -r requirements.txt`
+
+### Requirements Met
+
+✅ **Dependency Management:**
+- Poetry support via `pyproject.toml` (preferred)
+- pip support via `requirements.txt` (fallback)
+
+✅ **Event Propagator:**
+- Configurable intervals, endpoints, and event files
+- Random event selection
+- Command-line argument support
+
+✅ **Event Consumer:**
+- HTTP API `/event` endpoint (POST)
+- SQLite database storage
+- JSON schema validation
+- Configurable port and database settings
+
+## License
+
+This project is for educational purposes.
